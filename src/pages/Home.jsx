@@ -11,6 +11,11 @@ const languages = [
   { code: "hi", name: "Hindi" },
 ];
 
+const videoSources = {
+  en: englishVoiced,
+  ta: tamilVoiced,
+  hi: tamilVoiced,
+};
 const Home = () => {
   const [language, setLanguage] = useState(languages[0]);
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -20,12 +25,6 @@ const Home = () => {
   const video1Ref = useRef(null);
   const video2Ref = useRef(null);
   const uploadSectionRef = useRef(null);
-
-  const videoSources = {
-    en: englishVoiced,
-    ta: tamilVoiced,
-    hi: tamilVoiced, // Add the path for Hindi if available
-  };
 
   const handleScrollToUpload = () => {
     uploadSectionRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,7 +90,19 @@ const Home = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden flex flex-col">
-      <nav className="flex justify-end p-4">
+      <nav className="flex justify-between p-4">
+        <div className="relative">
+          <a
+            href="https://randomwalk.ai/"
+            className="text-lg text-purple-600 md:text-2xl font-medium"
+            target="_blank"
+          >
+            Tamil Translator
+          </a>
+          <div className="absolute bottom-[0px] right-0 text-[12px] text-[#000] font-medium">
+            by RandomWalk
+          </div>
+        </div>
         <a
           href="https://docs.google.com/forms/d/e/1FAIpQLSeLAd-8NF5GWROmbpeq5QMgcOUFmjEdTTMwrU11_fo_6ZHx2A/viewform?usp=header"
           className="text-sm md:text-base font-medium px-4 py-2 rounded-full border-2 border-purple-600 text-purple-600 hover:bg-purple-50 transition-colors"
@@ -108,8 +119,8 @@ const Home = () => {
               Transform Your Videos with AI-Powered Dubbing
             </h1>
             <p className="text-lg md:text-xl mb-6 text-gray-600">
-              Instantly dub your videos into multiple languages, breaking language barriers and reaching a global
-              audience
+              Instantly dub your videos into multiple languages, breaking
+              language barriers and reaching a global audience
             </p>
           </div>
         </div>
@@ -142,20 +153,22 @@ const Home = () => {
               controls
             />
             <div className="mt-4 flex justify-center">
-              <div className="bg-white p-1 rounded-full shadow-lg">
-                {languages.map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => handleLanguageChange(lang)}
-                    className={`px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
-                      language.code === lang.code
-                        ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {lang.name}
-                  </button>
-                ))}
+              <div className="bg-white p-1 rounded-full shadow-lg overflow-x-scroll scrollbar-hide w-[230px]">
+                <div className="flex space-x-2 w-max">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang)}
+                      className={`px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
+                        language.code === lang.code
+                          ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

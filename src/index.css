@@ -42,4 +42,13 @@ body{
       --foreground: 255, 255, 255; /* Light text in dark mode */
     }
   }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* For Firefox */
+  .scrollbar-hide {
+    scrollbar-width: none;
+  }
   

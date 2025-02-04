@@ -16,30 +16,59 @@ const languages = [
 ];
 
 const Home = () => {
-
   const [language, setLanguage] = useState(languages[0]);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const videoRef = useRef(null);
+  const [activeVideo, setActiveVideo] = useState("video1");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const video1Ref = useRef(null);
+  const video2Ref = useRef(null);
   const uploadSectionRef = useRef(null);
+
+  const videoSources = {
+    en: englishVoiced,
+    ta: tamilVoiced,
+    hi: tamilVoiced, // Add the path for Hindi if available
+  };
 
   const handleScrollToUpload = () => {
     uploadSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleLanguageChange = (lang) => {
+  const handleLanguageChange = async (lang) => {
     setLanguage(lang);
-    if (videoRef.current) {
-      const currentTime = videoRef.current.currentTime;
-      if (lang.name == "English") {
-        videoRef.current.src = englishVoiced;
-      } else {
-        videoRef.current.src = tamilVoiced;
-      }
+    setIsTransitioning(true);
 
-      videoRef.current.currentTime = currentTime;
-      videoRef.current.play();
+    const currentVideoRef = activeVideo === "video1" ? video1Ref : video2Ref;
+    const nextVideoRef = activeVideo === "video1" ? video2Ref : video1Ref;
+
+    // Get current playback state
+    const currentTime = currentVideoRef.current.currentTime;
+    const wasPlaying = !currentVideoRef.current.paused;
+
+    // Pause the current video first
+    currentVideoRef.current.pause();
+
+    // Prepare the next video
+    nextVideoRef.current.src = videoSources[lang.code];
+    nextVideoRef.current.currentTime = currentTime;
+
+    // Wait for the next video to be ready
+    await new Promise((resolve) => {
+      nextVideoRef.current.addEventListener('loadeddata', resolve, { once: true });
+    });
+
+    if (wasPlaying) {
+      try {
+        await nextVideoRef.current.play();
+      } catch (error) {
+        console.error("Error playing video:", error);
+      }
     }
+
+    // Switch visibility
+    setActiveVideo(activeVideo === "video1" ? "video2" : "video1");
+    setIsTransitioning(false);
   };
 
   const handleFileUpload = (file) => {
@@ -57,6 +86,8 @@ const Home = () => {
       const response = await generateVideo(uploadedFile);
     } catch (err) {
       console.log("Error generating the video.", err);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -70,8 +101,27 @@ const Home = () => {
           <h2 className="text-4xl font-bold mb-16 text-center bg-gradient-to-r from-purple-600 to-violet-600 text-transparent bg-clip-text">
             See It in Action
           </h2>
-          <div className="max-w-4xl mx-auto">
-            <VideoPlayer ref={videoRef} src={englishVoiced} />
+          <div className="max-w-4xl mx-auto relative">
+            {/* Video 1 */}
+            <VideoPlayer
+              ref={video1Ref}
+              src={videoSources[language.code]}
+              style={{
+                display: activeVideo === "video1" ? "block" : "none",
+                width: "100%",
+              }}
+              controls
+            />
+            {/* Video 2 */}
+            <VideoPlayer
+              ref={video2Ref}
+              src={videoSources[language.code]}
+              style={{
+                display: activeVideo === "video2" ? "block" : "none",
+                width: "100%",
+              }}
+              controls
+            />
             <div className="mt-8 flex justify-center">
               <div className="bg-white p-2 rounded-full shadow-lg">
                 {languages.map((lang) => (
